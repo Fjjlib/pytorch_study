@@ -14,7 +14,19 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 
+class GetLoader(torch.utils.data.Dataset):
+    #initial
+    def __init__(self, data_root, data_label):
+        self.data = data_root
+        self.label = data_label
+        
+    def __getitem__(self, index):
+        data = self.data[index]
+        label = self.label[index]
+        return data, label
 
+    def __len__(self):
+        return len(self.data)
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -75,6 +87,18 @@ if __name__=='__main__':
         download=True,
         transform=ToTensor()
     )
+    
+    source_data = []
+    source_label = []
+    for i in range(len(training_data)):
+        source_data_tmp, source_label_tmp = training_data[i]
+        source_data.append(source_data_tmp)
+        source_label.append(source_label_tmp)
+        
+    source_data = training_data.train_data.float()
+    source_label = training_data.train_labels.long()
+    dataset_diy = GetLoader(source_data, source_label)
+    
     
     test_data = datasets.FashionMNIST(
         root="data",
